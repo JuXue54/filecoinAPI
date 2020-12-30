@@ -1,8 +1,6 @@
 package controller
 
-import(
-	"gjson"
-)
+
 
 // requestJSON 把请求参数转成 JSON 对象
 func requestJSON(req *http.Request) gjson.Result {
@@ -21,7 +19,3 @@ func requestJSONString(req *http.Request) string {
 }
 
 
-// 暴露filecoin主网参数给外界
-func mainnet(req *http.Request){
-
-}
