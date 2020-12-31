@@ -5,6 +5,7 @@ import(
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"encoding/json"
 )
 
 
@@ -25,5 +26,12 @@ func main(){
 	defer resp.Body.Close()
 
 	body,_:=ioutil.ReadAll(resp.Body)
-	fmt.Println(string(body))
+	m:=make(map[string]interface{})
+	err0:=json.Unmarshal(body, &m)
+	if err0!=nil{
+		fmt.Println(err)
+	}else{
+		fmt.Println(m["result"].(map[string]interface{})["Height"])
+	}
+	
 }
