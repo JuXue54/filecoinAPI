@@ -1,5 +1,3 @@
-module github.com/JuXue54/filecoinAPI
+module zerone/filecoinAPI
 
 go 1.15
-
-version latest

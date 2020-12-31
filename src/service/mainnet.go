@@ -1,37 +1,43 @@
 package service
 
-import(
+import (
 	"bytes"
-	"fmt"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 )
 
+func addReqHeader(req *http.Request) {
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Toekn", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBbGxvdyI6WyJyZWFkIiwid3JpdGUiLCJzaWduIiwiYWRtaW4iXX0.8jNrK7zUE25ekawT-xIx4x_vTbl3GWa05PjvGkN1Wzo")
+}
+
 // 查找区块高度的服务
-func ChainHead() (string,error){
-	url:="http://3.87.90.124:1234/rpc/v0"
-	post:="{\"id\": 0,\"jsonrpc\": \"2.0\",\"method\": \"Filecoin.ChainHead\",\"params\": []}"
+func ChainHead() (int, error) {
+	// 安装请求体
+	Post.Method = "Filecoin.ChainHead"
+	Post.Params = [0]interface{}{}
 
-	var jsonStr=[]byte(post)
-	req,err:=http.NewRequest("POST",url,bytes.NewBuffer(jsonStr))
-	req.Header.Set("Content-Type","application/json")
-	req.Header.Set("Toekn","Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBbGxvdyI6WyJyZWFkIiwid3JpdGUiLCJzaWduIiwiYWRtaW4iXX0.8jNrK7zUE25ekawT-xIx4x_vTbl3GWa05PjvGkN1Wzo")
+	jsonStr, err := json.Marshal(Post)
+	if err != nil {
+		panic(err)
+	}
+	req, err := http.NewRequest("POST", URL, bytes.NewBuffer(jsonStr))
+	addReqHeader(req)
 
-	client:=&http.Client{}
-	resp,err:=client.Do(req)
-	if err!=nil{
+	// 获取响应结果
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
 		panic(err)
 	}
 	defer resp.Body.Close()
-
-	body,_:=ioutil.ReadAll(resp.Body)
-	m:=make(map[string]interface{})
-	err0:=json.Unmarshal(body, &m)
-	if err0!=nil{
-		fmt.Println(err)
-	}else{
-		fmt.Println(m["result"].(map[string]interface{})["Height"])
+	body, _ := ioutil.ReadAll(resp.Body)
+	m := make(map[string]interface{})
+	err = json.Unmarshal(body, &m)
+	if err != nil {
+		panic(err)
 	}
-	height:=m["result"].(map[string]interface{})["Height"]
-	return string(height),err0
+	height := int(m["result"].(map[string]interface{})["Height"].(float64))
+	return height, err
 }

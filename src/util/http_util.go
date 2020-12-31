@@ -1,8 +1,9 @@
 package util
 
-import(
-	"net/http"
+import (
 	"io/ioutil"
+	"net/http"
+	"strings"
 )
 
 // RequestJSON 直接获取 请求参数是 JSON 的字符串
@@ -61,4 +62,3 @@ func SendHTTPDo(url string, method string, params string, mime string, header ma
 
 	return string(body)
 }
-

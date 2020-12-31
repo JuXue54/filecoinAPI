@@ -1,41 +1,42 @@
 package main
 
 import (
-	"github.com/JuXue54/filecoinAPI/controller"
-	"net/http"
 	"context"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"time"
+
+	"zerone/filecoinAPI/src/controller"
 )
 
-func main(){
-	mux:=http.NewServeMux()
+func main() {
+	mux := http.NewServeMux()
 
-	mux.HandleFunc("/api/pool/filecoin", controller.mainnet())
+	mux.HandleFunc("/api/pool/filecoin", controller.Mainnet)
 
-	timeOut:=time.Second*60
-	srv:=&http.Server{
-		Addr:	":8080",
-		Handler: mux,
-		ReadTimeout: timeOut,
+	timeOut := time.Second * 60
+	srv := &http.Server{
+		Addr:         ":8080",
+		Handler:      mux,
+		ReadTimeout:  timeOut,
 		WriteTimeout: timeOut,
-		IdleTimeout: timeOut*2,
+		IdleTimeout:  timeOut * 2,
 	}
 
-	go func(){
-		if err:=srv.ListenAndServe(); err!=nil{
+	go func() {
+		if err := srv.ListenAndServe(); err != nil {
 			log.Fatalf("listen and serve http server fail:\n%v", err)
 		}
 	}()
 
-	exit:=make(chan os.Signal)
-	signal.Notify(exit,os.Interrupt)
+	exit := make(chan os.Signal)
+	signal.Notify(exit, os.Interrupt)
 	<-exit
-	ctx,cacel:=context.WithTimeout(context.Background(),timeOut)
+	ctx, cacel := context.WithTimeout(context.Background(), timeOut)
 	defer cacel()
-	err:=srv.Shutdown(ctx)
-	log.Println("shutting down now. ",err)
+	err := srv.Shutdown(ctx)
+	log.Println("shutting down now. ", err)
 	os.Exit(0)
 }
