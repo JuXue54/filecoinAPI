@@ -9,4 +9,5 @@ type ReqBody struct {
 
 type RespBody struct {
 	Height int `json:"height"`
+	TotalPower float64 `json:"qualityAdjPower"`
 }

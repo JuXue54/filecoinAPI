@@ -9,25 +9,30 @@ import (
 )
 
 // 拿到当前的区块头
-func chainHead() int {
-	height, err := service.ChainHead()
-	if err == nil {
-		return height
-	} else {
-		return -1
-	}
+func chainHead() (int,error) {
+	return service.ChainHead()
+}
+
+// 拿到当前的全网算力
+func totalPower() (float64,error){
+	return service.TotalPower()
 }
 
 // 返回主网数据
 func Mainnet(w http.ResponseWriter, req *http.Request) {
-	//fmt.Println(*req)
-	w.Header().Set("Content-Type", "application/json")
-	h := chainHead()
-	resp := model.RespBody{Height: h}
+	// 封装返回数据并做错误处理
+	height,err := chainHead()
+	power,err:=totalPower()
+	resp := model.RespBody{
+		Height: height,
+		TotalPower: power,
+	}
 	b, err := json.Marshal(resp)
-	if err == nil && h > -1 {
+	// 返回json
+	w.Header().Set("Content-Type", "application/json")
+	if err == nil {
 		w.Write(b)
 	} else {
-		w.Write([]byte("some error happen 505"))
+		w.Write([]byte("server error 505: "+err.Error()))
 	}
 }
